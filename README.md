@@ -80,7 +80,7 @@ object IP2LocationTest {
       else if ("MISSING_FILE" == rec.getStatus) System.out.println("Invalid database path.")
       else if ("IPV6_NOT_SUPPORTED" == rec.getStatus) System.out.println("This BIN does not contain IPv6 data.")
       else System.out.println("Unknown error." + rec.getStatus)
-      System.out.println("Java Component: " + rec.getVersion)
+      System.out.println("Version: " + rec.getVersion)
     } catch {
       case e: Exception =>
         System.out.println(e)
