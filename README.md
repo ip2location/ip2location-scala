@@ -126,7 +126,6 @@ Below are the result fields.
 ```scala
 object IP2LocationTest {
   def main(args: Array[String]): Unit = {
-    val loc = new IP2Location
     try {
       val ws = new IP2LocationWebService
       val strIPAddress = "8.8.8.8"
