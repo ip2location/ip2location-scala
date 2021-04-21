@@ -33,7 +33,7 @@ import java.text.NumberFormat
  * <p>
  *
  * @author IP2Location.com
- * @version 8.5.2
+ * @version 8.0.0
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4

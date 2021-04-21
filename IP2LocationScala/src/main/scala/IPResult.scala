@@ -7,7 +7,7 @@ package com.ip2location
  * <p>
  *
  * @author IP2Location.com
- * @version 8.5.2
+ * @version 8.0.0
  */
 object IPResult {
   private[ip2location] val NOT_SUPPORTED = "Not_Supported"
@@ -35,7 +35,7 @@ class IPResult private[ip2location](var ip_address: String) {
   private[ip2location] var elevation: Float = _
   private[ip2location] var usagetype: String = _
   private[ip2location] var status: String = _
-  private[ip2location] val version: String = "Version 8.5.2"
+  private[ip2location] val version: String = "Version 8.0.0"
 
   /**
    * This method to get two-character country code based on ISO 3166.
