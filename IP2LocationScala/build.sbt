@@ -1,6 +1,6 @@
 name := "IP2LocationScala"
 
-version := "8.0.0"
+version := "8.0.1"
 
 scalaVersion := "2.13.5"
 

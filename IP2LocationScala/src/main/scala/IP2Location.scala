@@ -1,19 +1,13 @@
 package com.ip2location
 
-import java.net.InetAddress
-import java.net.Inet4Address
-import java.net.Inet6Address
-import java.net.UnknownHostException
+import java.net.{InetAddress, Inet4Address, Inet6Address, UnknownHostException}
 import java.io._
 import java.util._
 import java.util.regex._
 import java.math.BigInteger
-import java.nio.ByteBuffer
-import java.nio.MappedByteBuffer
-import java.nio.ByteOrder
+import java.nio.{ByteBuffer, ByteOrder, MappedByteBuffer}
 import java.nio.channels.FileChannel
-import java.text.DecimalFormat
-import java.text.NumberFormat
+import java.text.{DecimalFormat, NumberFormat}
 
 /**
  * This class performs the lookup of IP2Location data from an IP address by reading a BIN file.
@@ -33,7 +27,7 @@ import java.text.NumberFormat
  * <p>
  *
  * @author IP2Location.com
- * @version 8.0.0
+ * @version 8.0.1
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4
@@ -892,7 +886,7 @@ class IP2Location() {
     bi
   }
 
-  private def ipv4no(ipstring: String): Int = {
+  private def ipv4no(ipstring: String): Long = {
     val ipAddressInArray = ipstring.split("\\.")
     var result: Long = 0
     var ip: Long = 0
@@ -900,6 +894,6 @@ class IP2Location() {
       ip = ipAddressInArray(3 - x).toLong
       result |= ip << (x << 3)
     }
-    result.toInt
+    result
   }
 }

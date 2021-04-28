@@ -24,7 +24,7 @@ import java.net.URLEncoder
  * <p>
  *
  * @author IP2Location.com
- * @version 8.0.0
+ * @version 8.0.1
  */
 object IP2LocationWebService {
   private val pattern = Pattern.compile("^[\\dA-Z]{10}$")
