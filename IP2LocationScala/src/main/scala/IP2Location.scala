@@ -27,7 +27,7 @@ import java.text.{DecimalFormat, NumberFormat}
  * <p>
  *
  * @author IP2Location.com
- * @version 8.0.1
+ * @version 8.1.0
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4
@@ -43,25 +43,27 @@ object IP2Location {
   private val FROM_TEREDO = new BigInteger("42540488161975842760550356425300246528")
   private val TO_TEREDO = new BigInteger("42540488241204005274814694018844196863")
   private val LAST_32BITS = new BigInteger("4294967295")
-  private val COUNTRY_POSITION = Array(0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
-  private val REGION_POSITION = Array(0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
-  private val CITY_POSITION = Array(0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
-  private val ISP_POSITION = Array(0, 0, 3, 0, 5, 0, 7, 5, 7, 0, 8, 0, 9, 0, 9, 0, 9, 0, 9, 7, 9, 0, 9, 7, 9)
-  private val LATITUDE_POSITION = Array(0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)
-  private val LONGITUDE_POSITION = Array(0, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6)
-  private val DOMAIN_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 6, 8, 0, 9, 0, 10, 0, 10, 0, 10, 0, 10, 8, 10, 0, 10, 8, 10)
-  private val ZIPCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 7, 7, 7, 0, 7, 0, 7, 7, 7, 0, 7)
-  private val TIMEZONE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 8, 8, 8, 7, 8, 0, 8, 8, 8, 0, 8)
-  private val NETSPEED_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 11, 0, 11, 8, 11, 0, 11, 0, 11, 0, 11)
-  private val IDDCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 12, 0, 12, 0, 12, 9, 12, 0, 12)
-  private val AREACODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 13, 0, 13, 0, 13, 10, 13, 0, 13)
-  private val WEATHERSTATIONCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 14, 0, 14, 0, 14, 0, 14)
-  private val WEATHERSTATIONNAME_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 15, 0, 15, 0, 15, 0, 15)
-  private val MCC_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 16, 0, 16, 9, 16)
-  private val MNC_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 17, 0, 17, 10, 17)
-  private val MOBILEBRAND_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 18, 0, 18, 11, 18)
-  private val ELEVATION_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 19, 0, 19)
-  private val USAGETYPE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 20)
+  private val COUNTRY_POSITION = Array(0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+  private val REGION_POSITION = Array(0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
+  private val CITY_POSITION = Array(0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
+  private val ISP_POSITION = Array(0, 0, 3, 0, 5, 0, 7, 5, 7, 0, 8, 0, 9, 0, 9, 0, 9, 0, 9, 7, 9, 0, 9, 7, 9, 9)
+  private val LATITUDE_POSITION = Array(0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)
+  private val LONGITUDE_POSITION = Array(0, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6)
+  private val DOMAIN_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 6, 8, 0, 9, 0, 10, 0, 10, 0, 10, 0, 10, 8, 10, 0, 10, 8, 10, 10)
+  private val ZIPCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 7, 7, 7, 0, 7, 0, 7, 7, 7, 0, 7, 7)
+  private val TIMEZONE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 8, 8, 8, 7, 8, 0, 8, 8, 8, 0, 8, 8)
+  private val NETSPEED_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 11, 0, 11, 8, 11, 0, 11, 0, 11, 0, 11, 11)
+  private val IDDCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 12, 0, 12, 0, 12, 9, 12, 0, 12, 12)
+  private val AREACODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 13, 0, 13, 0, 13, 10, 13, 0, 13, 13)
+  private val WEATHERSTATIONCODE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 14, 0, 14, 0, 14, 0, 14, 14)
+  private val WEATHERSTATIONNAME_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 15, 0, 15, 0, 15, 0, 15, 15)
+  private val MCC_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 16, 0, 16, 9, 16, 16)
+  private val MNC_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 17, 0, 17, 10, 17, 17)
+  private val MOBILEBRAND_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 18, 0, 18, 11, 18, 18)
+  private val ELEVATION_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 19, 0, 19, 19)
+  private val USAGETYPE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 20, 20)
+  private val ADDRESSTYPE_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 21)
+  private val CATEGORY_POSITION = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22)
 }
 
 class IP2Location() {
@@ -103,6 +105,8 @@ class IP2Location() {
   private var MOBILEBRAND_POSITION_OFFSET: Int = _
   private var ELEVATION_POSITION_OFFSET: Int = _
   private var USAGETYPE_POSITION_OFFSET: Int = _
+  private var ADDRESSTYPE_POSITION_OFFSET: Int = _
+  private var CATEGORY_POSITION_OFFSET: Int = _
   private var COUNTRY_ENABLED: Boolean = _
   private var REGION_ENABLED: Boolean = _
   private var CITY_ENABLED: Boolean = _
@@ -122,6 +126,8 @@ class IP2Location() {
   private var MOBILEBRAND_ENABLED: Boolean = _
   private var ELEVATION_ENABLED: Boolean = _
   private var USAGETYPE_ENABLED: Boolean = _
+  private var ADDRESSTYPE_ENABLED: Boolean = _
+  private var CATEGORY_ENABLED: Boolean = _
 
   /**
    * This function can be used to pre-load the BIN file.
@@ -164,7 +170,7 @@ class IP2Location() {
 
   @throws[IOException]
   private def CreateMappedBytes(): Unit = {
-    var aFile: RandomAccessFile = null // shift here to address file handle exhaustion issue and NOT using FINAL variable
+    var aFile: RandomAccessFile = null
     try {
       aFile = new RandomAccessFile(IPDatabasePath, "r")
       val inChannel = aFile.getChannel
@@ -215,6 +221,15 @@ class IP2Location() {
       _MetaData.BaseAddrIPv6 = _HeaderBuffer.getInt(17)
       _MetaData.IndexBaseAddr = _HeaderBuffer.getInt(21) //4 bytes
       _MetaData.IndexBaseAddrIPv6 = _HeaderBuffer.getInt(25)
+      _MetaData.ProductCode = _HeaderBuffer.get(29)
+      _MetaData.ProductType = _HeaderBuffer.get(30)
+      _MetaData.FileSize = _HeaderBuffer.getInt(31)
+
+      // check if is correct BIN (should be 1 for IP2Location BIN file), also checking for zipped file (PK being the first 2 chars)
+      if (((_MetaData.ProductCode != 1) && (_MetaData.DBYear >= 21)) || ((_MetaData.DBType == 80) && (_MetaData.DBColumn == 75))) { // only BINs from Jan 2021 onwards have this byte set
+        throw new IOException("Incorrect IP2Location BIN file format. Please make sure that you are using the latest IP2Location BIN file.")
+      }
+
       if (_MetaData.IndexBaseAddr > 0) _MetaData.Indexed = true
       if (_MetaData.DBCountIPv6 == 0) { // old style IPv4-only BIN file
         _MetaData.OldBIN = true
@@ -263,6 +278,10 @@ class IP2Location() {
       else 0
       USAGETYPE_POSITION_OFFSET = if (IP2Location.USAGETYPE_POSITION(dbtype) != 0) (IP2Location.USAGETYPE_POSITION(dbtype) - 2) << 2
       else 0
+      ADDRESSTYPE_POSITION_OFFSET = if (IP2Location.ADDRESSTYPE_POSITION(dbtype) != 0) (IP2Location.ADDRESSTYPE_POSITION(dbtype) - 2) << 2
+      else 0
+      CATEGORY_POSITION_OFFSET = if (IP2Location.CATEGORY_POSITION(dbtype) != 0) (IP2Location.CATEGORY_POSITION(dbtype) - 2) << 2
+      else 0
       COUNTRY_ENABLED = IP2Location.COUNTRY_POSITION(dbtype) != 0
       REGION_ENABLED = IP2Location.REGION_POSITION(dbtype) != 0
       CITY_ENABLED = IP2Location.CITY_POSITION(dbtype) != 0
@@ -282,6 +301,8 @@ class IP2Location() {
       MOBILEBRAND_ENABLED = IP2Location.MOBILEBRAND_POSITION(dbtype) != 0
       ELEVATION_ENABLED = IP2Location.ELEVATION_POSITION(dbtype) != 0
       USAGETYPE_ENABLED = IP2Location.USAGETYPE_POSITION(dbtype) != 0
+      ADDRESSTYPE_ENABLED = IP2Location.ADDRESSTYPE_POSITION(dbtype) != 0
+      CATEGORY_ENABLED = IP2Location.CATEGORY_POSITION(dbtype) != 0
       if (_MetaData.Indexed) {
         val _IndexBuffer = inChannel.map(FileChannel.MapMode.READ_ONLY, _MetaData.IndexBaseAddr - 1, _MetaData.BaseAddr - _MetaData.IndexBaseAddr) // reading indexes
         _IndexBuffer.order(ByteOrder.LITTLE_ENDIAN)
@@ -375,10 +396,6 @@ class IP2Location() {
       else {
         DestroyMappedBytes()
         filehandle = new RandomAccessFile(IPDatabasePath, "r")
-        if (filehandle == null) {
-          record.status = "MISSING_FILE"
-          return record
-        }
       }
 
       if (myiptype == 4) {
@@ -392,7 +409,7 @@ class IP2Location() {
         else mybaseaddr = _MetaData.BaseAddr
         mycolumnsize = _IPv4ColumnSize
         if (_MetaData.Indexed) {
-          indexaddr = ipno.shiftRight(16).intValue //new style for array
+          indexaddr = ipno.shiftRight(16).intValue
           low = _IndexArrayIPv4(indexaddr)(0)
           high = _IndexArrayIPv4(indexaddr)(1)
         }
@@ -467,7 +484,6 @@ class IP2Location() {
           }
           else record.isp = IPResult.NOT_SUPPORTED
           if (LATITUDE_ENABLED) {
-            // new requirement to "round" to 6 decimals
             record.latitude = setDecimalPlaces(readFloat_row(row, LATITUDE_POSITION_OFFSET)).toFloat
           }
           else record.latitude = 0
@@ -540,6 +556,16 @@ class IP2Location() {
             record.usagetype = readStr(position, mydatabuffer, filehandle)
           }
           else record.usagetype = IPResult.NOT_SUPPORTED
+          if (ADDRESSTYPE_ENABLED) {
+            position = read32_row(row, ADDRESSTYPE_POSITION_OFFSET).longValue
+            record.addresstype = readStr(position, mydatabuffer, filehandle)
+          }
+          else record.addresstype = IPResult.NOT_SUPPORTED
+          if (CATEGORY_ENABLED) {
+            position = read32_row(row, CATEGORY_POSITION_OFFSET).longValue
+            record.category = readStr(position, mydatabuffer, filehandle)
+          }
+          else record.category = IPResult.NOT_SUPPORTED
           record.status = "OK"
           breakloop = true
         }

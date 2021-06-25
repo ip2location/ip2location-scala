@@ -15,6 +15,9 @@ class MetaData private[ip2location]() {
   private var _IndexedIPv6 = false
   private var _IndexBaseAddr = 0
   private var _IndexBaseAddrIPv6 = 0
+  private var _ProductCode = 0
+  private var _ProductType = 0
+  private var _FileSize = 0
 
   def BaseAddr: Int = _BaseAddr
 
@@ -98,5 +101,23 @@ class MetaData private[ip2location]() {
 
   def IndexBaseAddrIPv6_=(newValue: Int): Unit = {
     _IndexBaseAddrIPv6 = newValue
+  }
+
+  def ProductCode: Int = _ProductCode
+
+  def ProductCode_=(newValue: Int): Unit = {
+    _ProductCode = newValue
+  }
+
+  def ProductType: Int = _ProductType
+
+  def ProductType_=(newValue: Int): Unit = {
+    _ProductType = newValue
+  }
+
+  def FileSize: Int = _FileSize
+
+  def FileSize_=(newValue: Int): Unit = {
+    _FileSize = newValue
   }
 }

@@ -7,7 +7,7 @@ package com.ip2location
  * <p>
  *
  * @author IP2Location.com
- * @version 8.0.1
+ * @version 8.1.0
  */
 object IPResult {
   private[ip2location] val NOT_SUPPORTED = "Not_Supported"
@@ -34,8 +34,10 @@ class IPResult private[ip2location](var ip_address: String) {
   private[ip2location] var mobilebrand: String = _
   private[ip2location] var elevation: Float = _
   private[ip2location] var usagetype: String = _
+  private[ip2location] var addresstype: String = _
+  private[ip2location] var category: String = _
   private[ip2location] var status: String = _
-  private[ip2location] val version: String = "Version 8.0.1"
+  private[ip2location] val version: String = "Version 8.1.0"
 
   /**
    * This method to get two-character country code based on ISO 3166.
@@ -47,63 +49,63 @@ class IPResult private[ip2location](var ip_address: String) {
   /**
    * This method to get country name based on ISO 3166.
    *
-   * @return the country name.
+   * @return the country name
    */
   def getCountryLong: String = country_long
 
   /**
    * This method to get region or state name.
    *
-   * @return the region or state name.
+   * @return the region or state name
    */
   def getRegion: String = region
 
   /**
    * This method to get city name.
    *
-   * @return the city name.
+   * @return the city name
    */
   def getCity: String = city
 
   /**
    * This method to get Internet Service Provider (ISP) name.
    *
-   * @return the ISP name.
+   * @return the ISP name
    */
   def getISP: String = isp
 
   /**
    * This method to get city latitude.
    *
-   * @return the city latitude.
+   * @return the city latitude
    */
   def getLatitude: Float = latitude
 
   /**
    * This method to get city longitude.
    *
-   * @return the city longitude.
+   * @return the city longitude
    */
   def getLongitude: Float = longitude
 
   /**
    * This method to get IP internet domain name associated to IP address range.
    *
-   * @return the domain name.
+   * @return the domain name
    */
   def getDomain: String = domain
 
   /**
    * This method to get ZIP/Postal code.
    *
-   * @return the ZIP/Postal code.
+   * @return the ZIP/Postal code
    */
   def getZipCode: String = zipcode
 
   /**
    * This method to get UTC time zone.
    *
-   * @return the time zone.
+   * @return the time zone
    */
   def getTimeZone: String = timezone
 
@@ -166,16 +168,30 @@ class IPResult private[ip2location](var ip_address: String) {
   /**
    * This method to get city elevation.
    *
-   * @return the city elevation.
+   * @return the city elevation
    */
   def getElevation: Float = elevation
 
   /**
    * This method to get usage type.
    *
-   * @return the usage type.
+   * @return the usage type
    */
   def getUsageType: String = usagetype
+
+  /**
+   * This method to get address type.
+   *
+   * @return the address type
+   */
+  def getAddressType: String = addresstype
+
+  /**
+   * This method to get category.
+   *
+   * @return the category
+   */
+  def getCategory: String = category
 
   /**
    * This method to get status code of query.
@@ -220,6 +236,8 @@ class IPResult private[ip2location](var ip_address: String) {
     buf.append("\tMobileBrand = " + mobilebrand + NL)
     buf.append("\tElevation = " + elevation + NL)
     buf.append("\tUsageType = " + usagetype + NL)
+    buf.append("\tAddressType = " + addresstype + NL)
+    buf.append("\tCategory = " + category + NL)
     buf.toString
   }
 }

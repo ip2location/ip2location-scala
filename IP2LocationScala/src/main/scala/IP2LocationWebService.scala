@@ -24,7 +24,7 @@ import java.net.URLEncoder
  * <p>
  *
  * @author IP2Location.com
- * @version 8.0.1
+ * @version 8.1.0
  */
 object IP2LocationWebService {
   private val pattern = Pattern.compile("^[\\dA-Z]{10}$")
@@ -40,7 +40,7 @@ class IP2LocationWebService() {
    * This function initializes the params for the web service.
    *
    * @param APIKey  IP2Location Web Service API key
-   * @param Package IP2Location Web Service package (WS1 to WS24)
+   * @param Package IP2Location Web Service package (WS1 to WS25)
    * @throws IllegalArgumentException If an invalid parameter is specified
    */
   @throws[IllegalArgumentException]
@@ -50,7 +50,7 @@ class IP2LocationWebService() {
    * This function initializes the params for the web service.
    *
    * @param APIKey  IP2Location Web Service API key
-   * @param Package IP2Location Web Service package (WS1 to WS24)
+   * @param Package IP2Location Web Service package (WS1 to WS25)
    * @param UseSSL  Set to true to call the web service using SSL
    * @throws IllegalArgumentException If an invalid parameter is specified
    */

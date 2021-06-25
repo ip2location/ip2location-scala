@@ -146,6 +146,18 @@ class IP2LocationTest extends AnyFunSuite with BeforeAndAfter with BeforeAndAfte
     assert(rec.getUsageType == "Not_Supported")
   }
 
+  test("TestQueryAddressType") {
+    loc.Open(binfilepath)
+    val rec = loc.IPQuery(ip)
+    assert(rec.getAddressType == "Not_Supported")
+  }
+
+  test("TestQueryCategory") {
+    loc.Open(binfilepath)
+    val rec = loc.IPQuery(ip)
+    assert(rec.getCategory == "Not_Supported")
+  }
+
   after {
     loc.Close()
   }
