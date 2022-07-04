@@ -20,11 +20,11 @@ import java.net.URLEncoder
  * <li>And much, much more!</li>
  * </ul>
  * <p>
- * Copyright (c) 2002-2021 IP2Location.com
+ * Copyright (c) 2002-2022 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.1.0
+ * @version 8.2.0
  */
 object IP2LocationWebService {
   private val pattern = Pattern.compile("^[\\dA-Z]{10}$")

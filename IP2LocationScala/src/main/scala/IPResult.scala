@@ -3,11 +3,11 @@ package com.ip2location
 /**
  * This class is used to store the geolocation data that is returned by the IP2Location class.
  * <p>
- * Copyright (c) 2002-2021 IP2Location.com
+ * Copyright (c) 2002-2022 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.1.0
+ * @version 8.2.0
  */
 object IPResult {
   private[ip2location] val NOT_SUPPORTED = "Not_Supported"
@@ -37,7 +37,7 @@ class IPResult private[ip2location](var ip_address: String) {
   private[ip2location] var addresstype: String = _
   private[ip2location] var category: String = _
   private[ip2location] var status: String = _
-  private[ip2location] val version: String = "Version 8.1.0"
+  private[ip2location] val version: String = "Version 8.2.0"
 
   /**
    * This method to get two-character country code based on ISO 3166.

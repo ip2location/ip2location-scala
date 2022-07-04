@@ -9,11 +9,14 @@ class IP2LocationTest extends AnyFunSuite with BeforeAndAfter with BeforeAndAfte
   private var loc: IP2Location = _
   private val binfile = "IP2LOCATION-LITE-DB1.BIN"
   private var binfilepath: String = _
+  private var binFileBytes: Array[Byte] = _
   private val ip = "8.8.8.8"
 
-  override def beforeAll {
+  override def beforeAll: Unit = {
     val binpath = Paths.get("src", "test", "resources", binfile)
     binfilepath = binpath.toFile.getAbsolutePath
+    import java.nio.file.Files
+    binFileBytes = Files.readAllBytes(binpath)
   }
 
   before {
@@ -23,6 +26,10 @@ class IP2LocationTest extends AnyFunSuite with BeforeAndAfter with BeforeAndAfte
   test("TestOpenException") {
     assertThrows[IOException] {
       loc.Open("dummy.bin")
+    }
+
+    assertThrows[NullPointerException] {
+      loc.Open(null.asInstanceOf[Array[Byte]])
     }
   }
 

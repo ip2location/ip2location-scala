@@ -8,6 +8,7 @@ import java.math.BigInteger
 import java.nio.{ByteBuffer, ByteOrder, MappedByteBuffer}
 import java.nio.channels.FileChannel
 import java.text.{DecimalFormat, NumberFormat}
+import java.io.IOException
 
 /**
  * This class performs the lookup of IP2Location data from an IP address by reading a BIN file.
@@ -23,11 +24,11 @@ import java.text.{DecimalFormat, NumberFormat}
  * <li>And much, much more!</li>
  * </ul>
  * <p>
- * Copyright (c) 2002-2021 IP2Location.com
+ * Copyright (c) 2002-2022 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.1.0
+ * @version 8.2.0
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4
@@ -86,6 +87,8 @@ class IP2Location() {
    * Sets the path for the BIN database (IPv4 BIN or IPv4+IPv6 BIN).
    */
   var IPDatabasePath = ""
+
+  private var binFile: FileLike.Supplier = _
   private var COUNTRY_POSITION_OFFSET: Int = _
   private var REGION_POSITION_OFFSET: Int = _
   private var CITY_POSITION_OFFSET: Int = _
@@ -129,6 +132,29 @@ class IP2Location() {
   private var ADDRESSTYPE_ENABLED: Boolean = _
   private var CATEGORY_ENABLED: Boolean = _
 
+  object FileLike {
+    trait Supplier {
+      @throws[IOException]
+      def open: FileLike
+
+      def isValid: Boolean
+    }
+  }
+
+  trait FileLike {
+    @throws[IOException]
+    def read(buffer: Array[Byte]): Int
+
+    @throws[IOException]
+    def read(b: Array[Byte], off: Int, len: Int): Int
+
+    @throws[IOException]
+    def seek(pos: Long): Unit
+
+    @throws[IOException]
+    def close(): Unit
+  }
+
   /**
    * This function can be used to pre-load the BIN file.
    *
@@ -138,11 +164,35 @@ class IP2Location() {
   @throws[IOException]
   def Open(DBPath: String): Unit = {
     IPDatabasePath = DBPath
+    binFile = new FileLike.Supplier() {
+      @throws[IOException]
+      override def open: FileLike = new FileLike() {
+        final private val aFile = new RandomAccessFile(DBPath, "r")
+
+        @throws[IOException]
+        override def read(buffer: Array[Byte]): Int = aFile.read(buffer)
+
+        @throws[IOException]
+        override def read(b: Array[Byte], off: Int, len: Int): Int = aFile.read(b, off, len)
+
+        @throws[IOException]
+        override def seek(pos: Long): Unit = {
+          aFile.seek(pos)
+        }
+
+        @throws[IOException]
+        override def close(): Unit = {
+          aFile.close()
+        }
+      }
+
+      override def isValid: Boolean = DBPath.nonEmpty
+    }
     LoadBIN
   }
 
   /**
-   * This function can be used to initialized the component with params and pre-load the BIN file.
+   * This function can be used to initialize the component with params and pre-load the BIN file.
    *
    * @param DBPath The full path to the IP2Location BIN database file
    * @param UseMMF Set to true to load the BIN database file into memory mapped file
@@ -152,6 +202,41 @@ class IP2Location() {
   def Open(DBPath: String, UseMMF: Boolean): Unit = {
     UseMemoryMappedFile = UseMMF
     Open(DBPath)
+  }
+
+  /**
+   * This function can be used to initialize the component with a byte array containing the BIN file data.
+   *
+   * @param DB The byte array containing the BIN file data
+   * @throws IOException If an input or output exception occurred
+   */
+  @throws[IOException]
+  def Open(DB: Array[Byte]): Unit = {
+    binFile = new FileLike.Supplier() {
+      override def open: FileLike = new FileLike() {
+        final private val stream = new ByteArrayInputStream(DB)
+
+        @throws[IOException]
+        override def read(buffer: Array[Byte]): Int = stream.read(buffer)
+
+        @throws[IOException]
+        override def read(b: Array[Byte], off: Int, len: Int): Int = stream.read(b, off, len)
+
+        @throws[IOException]
+        override def seek(pos: Long): Unit = {
+          stream.reset()
+          stream.skip(pos)
+        }
+
+        @throws[IOException]
+        override def close(): Unit = {
+          stream.close()
+        }
+      }
+
+      override def isValid: Boolean = DB.length > 0
+    }
+    LoadBIN
   }
 
   /**
@@ -201,14 +286,17 @@ class IP2Location() {
   }
 
   @throws[IOException]
-  private def LoadBIN = {
+  private def LoadBIN: Boolean = {
     var loadOK = false
-    var aFile: RandomAccessFile = null
-    try if (IPDatabasePath.nonEmpty) {
-      aFile = new RandomAccessFile(IPDatabasePath, "r")
-      val inChannel = aFile.getChannel
-      val _HeaderBuffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, 64) // 64 bytes header
+    var aFile: FileLike = null
+
+    try if (binFile.isValid) {
+      aFile = binFile.open
+      val _HeaderData = new Array[Byte](64)
+      aFile.read(_HeaderData)
+      val _HeaderBuffer = ByteBuffer.wrap(_HeaderData)
       _HeaderBuffer.order(ByteOrder.LITTLE_ENDIAN)
+
       _MetaData = new MetaData
       _MetaData.DBType = _HeaderBuffer.get(0)
       _MetaData.DBColumn = _HeaderBuffer.get(1)
@@ -303,25 +391,47 @@ class IP2Location() {
       USAGETYPE_ENABLED = IP2Location.USAGETYPE_POSITION(dbtype) != 0
       ADDRESSTYPE_ENABLED = IP2Location.ADDRESSTYPE_POSITION(dbtype) != 0
       CATEGORY_ENABLED = IP2Location.CATEGORY_POSITION(dbtype) != 0
+
       if (_MetaData.Indexed) {
-        val _IndexBuffer = inChannel.map(FileChannel.MapMode.READ_ONLY, _MetaData.IndexBaseAddr - 1, _MetaData.BaseAddr - _MetaData.IndexBaseAddr) // reading indexes
+        var readLen = _IndexArrayIPv4.length
+        if (_MetaData.IndexedIPv6) readLen += _IndexArrayIPv6.length
+
+        val _IndexData = new Array[Byte](readLen * 8) // 4 bytes for both from row and to row
+        aFile.seek(_MetaData.IndexBaseAddr - 1)
+        aFile.read(_IndexData)
+        val _IndexBuffer = ByteBuffer.wrap(_IndexData)
         _IndexBuffer.order(ByteOrder.LITTLE_ENDIAN)
+
         var pointer = 0
+
         // read IPv4 index
-        for (x <- _IndexArrayIPv4.indices) {
+        var x = 0
+        while ( {
+          x < _IndexArrayIPv4.length
+        }) {
           _IndexArrayIPv4(x)(0) = _IndexBuffer.getInt(pointer) // 4 bytes for from row
+
           _IndexArrayIPv4(x)(1) = _IndexBuffer.getInt(pointer + 4) // 4 bytes for to row
+
           pointer += 8
+
+          x += 1
         }
+
         if (_MetaData.IndexedIPv6) { // read IPv6 index
-          for (x <- _IndexArrayIPv6.indices) {
+          var x = 0
+          while ( {
+            x < _IndexArrayIPv6.length
+          }) {
             _IndexArrayIPv6(x)(0) = _IndexBuffer.getInt(pointer)
             _IndexArrayIPv6(x)(1) = _IndexBuffer.getInt(pointer + 4)
             pointer += 8
+
+            x += 1
           }
         }
       }
-      if (UseMemoryMappedFile) CreateMappedBytes(inChannel)
+      if (UseMemoryMappedFile) CreateMappedBytes()
       else DestroyMappedBytes()
       loadOK = true
     }
@@ -340,9 +450,12 @@ class IP2Location() {
   def IPQuery(IPAddress: String): IPResult = {
     val IP = IPAddress.trim
     val record = new IPResult(IP)
-    var filehandle: RandomAccessFile = null
+    var filehandle: FileLike = null
     var mybuffer: ByteBuffer = null
     var mydatabuffer: ByteBuffer = null
+    var row: Array[Byte] = null
+    var fullrow: Array[Byte] = null
+
     try {
       if (IP == null || IP.isEmpty) {
         record.status = "EMPTY_IP_ADDRESS"
@@ -383,6 +496,8 @@ class IP2Location() {
       var position: Long = 0
       var ipfrom = BigInteger.ZERO
       var ipto = BigInteger.ZERO
+      var firstcol: Int = 4 // IP From is 4 bytes
+
       // Read BIN if haven't done so
       if (_MetaData == null) if (!LoadBIN) { // problems reading BIN
         record.status = "MISSING_FILE"
@@ -395,7 +510,7 @@ class IP2Location() {
       }
       else {
         DestroyMappedBytes()
-        filehandle = new RandomAccessFile(IPDatabasePath, "r")
+        filehandle = binFile.open
       }
 
       if (myiptype == 4) {
@@ -415,6 +530,7 @@ class IP2Location() {
         }
       }
       else { // IPv6
+        firstcol = 16 // IPv6 is 16 bytes
         if (_MetaData.OldBIN) {
           record.status = "IPV6_NOT_SUPPORTED"
           return record
@@ -441,23 +557,34 @@ class IP2Location() {
         mid = (low + high) / 2
         rowoffset = mybaseaddr + (mid * mycolumnsize)
         rowoffset2 = rowoffset + mycolumnsize
-        if (UseMemoryMappedFile) overcapacity = rowoffset2 >= mybufcapacity
-        ipfrom = read32or128(rowoffset, myiptype, mybuffer, filehandle)
-        ipto = if (overcapacity) BigInteger.ZERO
-        else read32or128(rowoffset2, myiptype, mybuffer, filehandle)
+
+        import java.math.BigInteger
+        if (UseMemoryMappedFile) { // only reading the IP From fields
+          overcapacity = rowoffset2 >= mybufcapacity
+          ipfrom = read32or128(rowoffset, myiptype, mybuffer, filehandle)
+          ipto = if (overcapacity) BigInteger.ZERO
+          else read32or128(rowoffset2, myiptype, mybuffer, filehandle)
+        }
+        else { // reading IP From + whole row + next IP From
+          fullrow = readrow(rowoffset, mycolumnsize + firstcol, mybuffer, filehandle)
+          ipfrom = read32or128_row(fullrow, 0, firstcol)
+          ipto = if (overcapacity) BigInteger.ZERO
+          else read32or128_row(fullrow, mycolumnsize, firstcol)
+        }
+
         if (ipno.compareTo(ipfrom) >= 0 && ipno.compareTo(ipto) < 0) {
-          var firstcol = 4 // IP From is 4 bytes
-          if (myiptype == 6) {
-            firstcol = 16 // IPv6 is 16 bytes
-          }
-          // read the row here after the IP From column (remaining columns are all 4 bytes)
           val rowlen = mycolumnsize - firstcol
-          var row: Array[Byte] = null
-          row = readrow(rowoffset + firstcol, rowlen, mybuffer, filehandle)
+
           if (UseMemoryMappedFile) {
+            row = readrow(rowoffset + firstcol, rowlen, mybuffer, filehandle)
             mydatabuffer = _MapDataBuffer.duplicate // this is to enable reading of a range of bytes in multi-threaded environment
             mydatabuffer.order(ByteOrder.LITTLE_ENDIAN)
           }
+          else {
+            row = new Array[Byte](rowlen)
+            System.arraycopy(fullrow, firstcol, row, 0, rowlen) // extract the actual row data
+          }
+
           if (COUNTRY_ENABLED) {
             position = read32_row(row, COUNTRY_POSITION_OFFSET).longValue
             record.country_short = readStr(position, mydatabuffer, filehandle)
@@ -765,7 +892,7 @@ class IP2Location() {
   }
 
   @throws[IOException]
-  private def readrow(position: Long, mylen: Long, mybuffer: ByteBuffer, filehandle: RandomAccessFile): Array[Byte] = {
+  private def readrow(position: Long, mylen: Long, mybuffer: ByteBuffer, filehandle: FileLike): Array[Byte] = {
     val row = new Array[Byte](mylen.toInt)
     if (UseMemoryMappedFile) {
       mybuffer.position(position.toInt)
@@ -779,14 +906,22 @@ class IP2Location() {
   }
 
   @throws[IOException]
-  private def read32or128(position: Long, myiptype: Int, mybuffer: ByteBuffer, filehandle: RandomAccessFile): BigInteger = {
+  private def read32or128_row(row: Array[Byte], from: Int, len: Int) = {
+    val buf = new Array[Byte](len)
+    System.arraycopy(row, from, buf, 0, len)
+    reverse(buf)
+    new BigInteger(1, buf)
+  }
+
+  @throws[IOException]
+  private def read32or128(position: Long, myiptype: Int, mybuffer: ByteBuffer, filehandle: FileLike): BigInteger = {
     if (myiptype == 4) return read32(position, mybuffer, filehandle)
     else if (myiptype == 6) return read128(position, mybuffer, filehandle) // only IPv6 will run this
     BigInteger.ZERO
   }
 
   @throws[IOException]
-  private def read128(position: Long, mybuffer: ByteBuffer, filehandle: RandomAccessFile): BigInteger = {
+  private def read128(position: Long, mybuffer: ByteBuffer, filehandle: FileLike): BigInteger = {
     var retval = BigInteger.ZERO
     val bsize = 16
     val buf = new Array[Byte](bsize)
@@ -813,7 +948,7 @@ class IP2Location() {
   }
 
   @throws[IOException]
-  private def read32(position: Long, mybuffer: ByteBuffer, filehandle: RandomAccessFile): BigInteger = if (UseMemoryMappedFile) {
+  private def read32(position: Long, mybuffer: ByteBuffer, filehandle: FileLike): BigInteger = if (UseMemoryMappedFile) {
     // simulate unsigned int by using long
     BigInteger.valueOf(mybuffer.getInt(position.toInt) & 0xffffffffL) // use absolute offset to be thread-safe
   }
@@ -827,28 +962,34 @@ class IP2Location() {
   }
 
   @throws[IOException]
-  private def readStr(position: Long, mydatabuffer: ByteBuffer, filehandle: RandomAccessFile): String = {
-    var size = 0
+  private def readStr(position: Long, mydatabuffer: ByteBuffer, filehandle: FileLike): String = {
+    var size = 256 // max size of string field + 1 byte for the length
+    var len = 0
+    val data = new Array[Byte](size)
     var buf: Array[Byte] = null
-    var pos = position
+
     if (UseMemoryMappedFile) {
-      pos = pos - _MapDataOffset // position stored in BIN file is for full file, not just the mapped data segment, so need to minus
-      size = _MapDataBuffer.get(pos.toInt) // use absolute offset to be thread-safe (keep using the original buffer since is absolute position & just reading 1 byte)
+      val pos = position - _MapDataOffset // position stored in BIN file is for full file, not just the mapped data segment, so need to minus
+
       try {
-        buf = new Array[Byte](size)
-        mydatabuffer.position(pos.toInt + 1)
-        mydatabuffer.get(buf, 0, size)
+        mydatabuffer.position(pos.asInstanceOf[Int])
+        if (mydatabuffer.remaining < size) size = mydatabuffer.remaining
+        mydatabuffer.get(data, 0, size)
+        len = data(0)
+        buf = new Array[Byte](len)
+        System.arraycopy(data, 1, buf, 0, len)
       } catch {
         case _: NegativeArraySizeException =>
           return null
       }
     }
     else {
-      filehandle.seek(pos)
-      size = filehandle.read
+      filehandle.seek(position)
       try {
-        buf = new Array[Byte](size)
-        filehandle.read(buf, 0, size)
+        filehandle.read(data, 0, size)
+        len = data(0)
+        buf = new Array[Byte](len)
+        System.arraycopy(data, 1, buf, 0, len)
       } catch {
         case _: NegativeArraySizeException =>
           return null

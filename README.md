@@ -21,6 +21,7 @@ Below are the functions supported in this library.
 |---|---|
 |Open(DBPath: String, UseMMF: Boolean)|Initialize the component with the BIN file path and whether to use MemoryMappedFile.|
 |Open(DBPath: String)|Initialize the component with the BIN file path.|
+|Open(DB: Array[Byte])|Initialize the component with a byte array containing the BIN file data.|
 |IPQuery(IPAddress: String)|Query IP address. This function returns results in the IPResult object.|
 |Close()|Destroys the mapped bytes.|
 
@@ -73,8 +74,14 @@ object IP2LocationTest {
     try {
       val ip = "8.8.8.8"
       val binfile = "/usr/data/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-ADDRESSTYPE-CATEGORY.BIN"
+
       val useMMF = true
-      loc.Open(binfile, useMMF)
+      loc.Open(binfile, useMMF) // initialize with BIN file
+
+      // val binpath = Paths.get(binfile)
+      // val binFileBytes = Files.readAllBytes(binpath)
+      // loc.Open(binFileBytes) // initialize with byte array
+
       val rec = loc.IPQuery(ip)
       if ("OK" == rec.getStatus) System.out.println(rec)
       else if ("EMPTY_IP_ADDRESS" == rec.getStatus) System.out.println("IP address cannot be blank.")
