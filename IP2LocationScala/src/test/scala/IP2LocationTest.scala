@@ -1,6 +1,7 @@
 package com.ip2location
 
 import java.nio.file.Paths
+import java.nio.file.Files
 import java.io.IOException
 import org.scalatest._
 import org.scalatest.funsuite.AnyFunSuite
@@ -15,7 +16,6 @@ class IP2LocationTest extends AnyFunSuite with BeforeAndAfter with BeforeAndAfte
   override def beforeAll: Unit = {
     val binpath = Paths.get("src", "test", "resources", binfile)
     binfilepath = binpath.toFile.getAbsolutePath
-    import java.nio.file.Files
     binFileBytes = Files.readAllBytes(binpath)
   }
 
@@ -163,6 +163,24 @@ class IP2LocationTest extends AnyFunSuite with BeforeAndAfter with BeforeAndAfte
     loc.Open(binfilepath)
     val rec = loc.IPQuery(ip)
     assert(rec.getCategory == "Not_Supported")
+  }
+
+  test("TestQueryDistrict") {
+    loc.Open(binfilepath)
+    val rec = loc.IPQuery(ip)
+    assert(rec.getDistrict == "Not_Supported")
+  }
+
+  test("TestQueryASN") {
+    loc.Open(binfilepath)
+    val rec = loc.IPQuery(ip)
+    assert(rec.getASN == "Not_Supported")
+  }
+
+  test("TestQueryAS") {
+    loc.Open(binfilepath)
+    val rec = loc.IPQuery(ip)
+    assert(rec.getAS == "Not_Supported")
   }
 
   after {

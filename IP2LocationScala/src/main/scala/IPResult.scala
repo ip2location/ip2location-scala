@@ -3,11 +3,11 @@ package com.ip2location
 /**
  * This class is used to store the geolocation data that is returned by the IP2Location class.
  * <p>
- * Copyright (c) 2002-2022 IP2Location.com
+ * Copyright (c) 2002-2023 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.2.0
+ * @version 8.3.0
  */
 object IPResult {
   private[ip2location] val NOT_SUPPORTED = "Not_Supported"
@@ -36,8 +36,11 @@ class IPResult private[ip2location](var ip_address: String) {
   private[ip2location] var usagetype: String = _
   private[ip2location] var addresstype: String = _
   private[ip2location] var category: String = _
+  private[ip2location] var district: String = _
+  private[ip2location] var asn: String = _
+  private[ip2location] var as: String = _
   private[ip2location] var status: String = _
-  private[ip2location] val version: String = "Version 8.2.0"
+  private[ip2location] val version: String = "Version 8.3.0"
 
   /**
    * This method to get two-character country code based on ISO 3166.
@@ -194,6 +197,27 @@ class IPResult private[ip2location](var ip_address: String) {
   def getCategory: String = category
 
   /**
+   * This method to get district.
+   *
+   * @return the district
+   */
+  def getDistrict: String = district
+
+  /**
+   * This method to get the autonomous system number (ASN).
+   *
+   * @return the ASN
+   */
+  def getASN: String = asn
+
+  /**
+   * This method to get the autonomous system (AS).
+   *
+   * @return the AS
+   */
+  def getAS: String = as
+
+  /**
    * This method to get status code of query.
    *
    * @return the status code
@@ -238,6 +262,9 @@ class IPResult private[ip2location](var ip_address: String) {
     buf.append("\tUsageType = " + usagetype + NL)
     buf.append("\tAddressType = " + addresstype + NL)
     buf.append("\tCategory = " + category + NL)
+    buf.append("\tDistrict = " + district + NL)
+    buf.append("\tASN = " + asn + NL)
+    buf.append("\tAS = " + as + NL)
     buf.toString
   }
 }
