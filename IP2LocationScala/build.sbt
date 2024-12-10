@@ -1,13 +1,8 @@
-name := "IP2LocationScala"
+ThisBuild / version := "8.3.1"
 
-version := "8.3.0"
+ThisBuild / scalaVersion := "3.3.4"
 
-scalaVersion := "2.13.5"
-
-idePackagePrefix := Some("com.ip2location")
-
-libraryDependencies += "com.google.code.gson" % "gson" % "2.8.9"
-
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.7"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.7" % "test"
+lazy val root = (project in file("."))
+  .settings(
+    name := "IP2LocationScala"
+  )
