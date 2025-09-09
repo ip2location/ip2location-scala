@@ -24,11 +24,11 @@ import java.io.IOException
  * <li>And much, much more!</li>
  * </ul>
  * <p>
- * Copyright (c) 2002-2024 IP2Location.com
+ * Copyright (c) 2002-2025 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.3.1
+ * @version 8.4.0
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4
@@ -68,6 +68,9 @@ object IP2Location {
   private val DISTRICT_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,23)
   private val ASN_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,24)
   private val AS_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,25)
+  private val ASDOMAIN_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,26)
+  private val ASUSAGETYPE_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,27)
+  private val ASCIDR_POSITION: Array[Int] = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,28)
 }
 
 class IP2Location() {
@@ -116,6 +119,9 @@ class IP2Location() {
   private var DISTRICT_POSITION_OFFSET: Int = _
   private var ASN_POSITION_OFFSET: Int = _
   private var AS_POSITION_OFFSET: Int = _
+  private var ASDOMAIN_POSITION_OFFSET: Int = _
+  private var ASUSAGETYPE_POSITION_OFFSET: Int = _
+  private var ASCIDR_POSITION_OFFSET: Int = _
   private var COUNTRY_ENABLED: Boolean = _
   private var REGION_ENABLED: Boolean = _
   private var CITY_ENABLED: Boolean = _
@@ -140,6 +146,9 @@ class IP2Location() {
   private var DISTRICT_ENABLED: Boolean = _
   private var ASN_ENABLED: Boolean = _
   private var AS_ENABLED: Boolean = _
+  private var ASDOMAIN_ENABLED: Boolean = _
+  private var ASUSAGETYPE_ENABLED: Boolean = _
+  private var ASCIDR_ENABLED: Boolean = _
 
   object FileLike {
     trait Supplier {
@@ -385,6 +394,12 @@ class IP2Location() {
       else 0
       AS_POSITION_OFFSET = if (IP2Location.AS_POSITION(dbtype) != 0) (IP2Location.AS_POSITION(dbtype) - 2) << 2
       else 0
+      ASDOMAIN_POSITION_OFFSET = if (IP2Location.ASDOMAIN_POSITION(dbtype) != 0) (IP2Location.ASDOMAIN_POSITION(dbtype) - 2) << 2
+      else 0
+      ASUSAGETYPE_POSITION_OFFSET = if (IP2Location.ASUSAGETYPE_POSITION(dbtype) != 0) (IP2Location.ASUSAGETYPE_POSITION(dbtype) - 2) << 2
+      else 0
+      ASCIDR_POSITION_OFFSET = if (IP2Location.ASCIDR_POSITION(dbtype) != 0) (IP2Location.ASCIDR_POSITION(dbtype) - 2) << 2
+      else 0
       COUNTRY_ENABLED = IP2Location.COUNTRY_POSITION(dbtype) != 0
       REGION_ENABLED = IP2Location.REGION_POSITION(dbtype) != 0
       CITY_ENABLED = IP2Location.CITY_POSITION(dbtype) != 0
@@ -409,6 +424,9 @@ class IP2Location() {
       DISTRICT_ENABLED = IP2Location.DISTRICT_POSITION(dbtype) != 0
       ASN_ENABLED = IP2Location.ASN_POSITION(dbtype) != 0
       AS_ENABLED = IP2Location.AS_POSITION(dbtype) != 0
+      ASDOMAIN_ENABLED = IP2Location.ASDOMAIN_POSITION(dbtype) != 0
+      ASUSAGETYPE_ENABLED = IP2Location.ASUSAGETYPE_POSITION(dbtype) != 0
+      ASCIDR_ENABLED = IP2Location.ASCIDR_POSITION(dbtype) != 0
 
       if (_MetaData.Indexed) {
         var readLen = _IndexArrayIPv4.length
@@ -725,6 +743,21 @@ class IP2Location() {
             record.as = readStr(position, mydatabuffer, filehandle)
           }
           else record.as = IPResult.NOT_SUPPORTED
+          if (ASDOMAIN_ENABLED) {
+            position = read32_row(row, ASDOMAIN_POSITION_OFFSET).longValue
+            record.asdomain = readStr(position, mydatabuffer, filehandle)
+          }
+          else record.asdomain = IPResult.NOT_SUPPORTED
+          if (ASUSAGETYPE_ENABLED) {
+            position = read32_row(row, ASUSAGETYPE_POSITION_OFFSET).longValue
+            record.asusagetype = readStr(position, mydatabuffer, filehandle)
+          }
+          else record.asusagetype = IPResult.NOT_SUPPORTED
+          if (ASCIDR_ENABLED) {
+            position = read32_row(row, ASCIDR_POSITION_OFFSET).longValue
+            record.ascidr = readStr(position, mydatabuffer, filehandle)
+          }
+          else record.ascidr = IPResult.NOT_SUPPORTED
           record.status = "OK"
           breakloop = true
         }

@@ -3,11 +3,11 @@ package com.ip2location
 /**
  * This class is used to store the geolocation data that is returned by the IP2Location class.
  * <p>
- * Copyright (c) 2002-2024 IP2Location.com
+ * Copyright (c) 2002-2025 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.3.1
+ * @version 8.4.0
  */
 object IPResult {
   private[ip2location] val NOT_SUPPORTED = "Not_Supported"
@@ -39,8 +39,11 @@ class IPResult private[ip2location](var ip_address: String) {
   private[ip2location] var district: String = _
   private[ip2location] var asn: String = _
   private[ip2location] var as: String = _
+  private[ip2location] var asdomain: String = _
+  private[ip2location] var asusagetype: String = _
+  private[ip2location] var ascidr: String = _
   private[ip2location] var status: String = _
-  private[ip2location] val version: String = "Version 8.3.0"
+  private[ip2location] val version: String = "Version 8.4.0"
 
   /**
    * This method to get two-character country code based on ISO 3166.
@@ -218,6 +221,27 @@ class IPResult private[ip2location](var ip_address: String) {
   def getAS: String = as
 
   /**
+   * This method to get the AS domain.
+   *
+   * @return the AS domain
+   */
+  def getASDomain: String = asdomain
+
+  /**
+   * This method to get the AS usage type.
+   *
+   * @return the AS usage type
+   */
+  def getASUsageType: String = asusagetype
+
+  /**
+   * This method to get the AS CIDR.
+   *
+   * @return the AS CIDR
+   */
+  def getASCIDR: String = ascidr
+
+  /**
    * This method to get status code of query.
    *
    * @return the status code
@@ -265,6 +289,9 @@ class IPResult private[ip2location](var ip_address: String) {
     buf.append("\tDistrict = " + district + NL)
     buf.append("\tASN = " + asn + NL)
     buf.append("\tAS = " + as + NL)
+    buf.append("\tASDomain = " + asdomain + NL)
+    buf.append("\tASUsageType = " + asusagetype + NL)
+    buf.append("\tASCIDR = " + ascidr + NL)
     buf.toString
   }
 }
