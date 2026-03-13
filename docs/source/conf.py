@@ -6,11 +6,11 @@
 # -- Project information
 
 project = 'IP2Location Scala'
-copyright = '2025, IP2Location'
+copyright = '2026, IP2Location'
 author = 'IP2Location'
 
-release = '8.4.0'
-version = '8.4.0'
+release = '8.5.0'
+version = '8.5.0'
 
 # -- General configuration
 

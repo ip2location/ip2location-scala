@@ -24,11 +24,11 @@ import java.io.IOException
  * <li>And much, much more!</li>
  * </ul>
  * <p>
- * Copyright (c) 2002-2025 IP2Location.com
+ * Copyright (c) 2002-2026 IP2Location.com
  * <p>
  *
  * @author IP2Location.com
- * @version 8.4.0
+ * @version 8.5.0
  */
 object IP2Location {
   private val pattern = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") // IPv4

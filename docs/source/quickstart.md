@@ -15,7 +15,10 @@ Use the IPv4 BIN file if you just need to query IPv4 addresses.
 Use the IPv6 BIN file if you need to query BOTH IPv4 and IPv6 addresses.
 
 ## Requirements ##
-Intellij IDEA: https://www.jetbrains.com/idea/
+Intellij IDEA: <https://www.jetbrains.com/idea/>
+
+## Installation ##
+IP2Location Scala: <https://central.sonatype.com/artifact/com.ip2location/ip2location-scala_3>
 
 ## Sample Codes
 
@@ -24,32 +27,28 @@ Intellij IDEA: https://www.jetbrains.com/idea/
 You can query the geolocation information from the IP2Location BIN database as below:
 
 ```scala
-object IP2LocationTest {
-  def main(args: Array[String]): Unit = {
-    val loc = new IP2Location
-    try {
-      val ip = "8.8.8.8"
-      val binfile = "/usr/data/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-ADDRESSTYPE-CATEGORY-DISTRICT-ASN.BIN"
+import com.ip2location.IP2Location
 
-      val useMMF = true
-      loc.Open(binfile, useMMF) // initialize with BIN file
+@main def testip2location(): Unit = {
+  val loc = new IP2Location
+  try {
+    val ip = "8.8.8.8"
+    val binfile = "/usr/data/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-ADDRESSTYPE-CATEGORY-DISTRICT-ASN.BIN"
 
-      // val binpath = Paths.get(binfile)
-      // val binFileBytes = Files.readAllBytes(binpath)
-      // loc.Open(binFileBytes) // initialize with byte array
+    val useMMF = false
+    loc.Open(binfile, useMMF) // initialize with BIN file
 
-      val rec = loc.IPQuery(ip)
-      if ("OK" == rec.getStatus) System.out.println(rec)
-      else if ("EMPTY_IP_ADDRESS" == rec.getStatus) System.out.println("IP address cannot be blank.")
-      else if ("INVALID_IP_ADDRESS" == rec.getStatus) System.out.println("Invalid IP address.")
-      else if ("MISSING_FILE" == rec.getStatus) System.out.println("Invalid database path.")
-      else if ("IPV6_NOT_SUPPORTED" == rec.getStatus) System.out.println("This BIN does not contain IPv6 data.")
-      else System.out.println("Unknown error." + rec.getStatus)
-    } catch {
-      case e: Exception =>
-        System.out.println(e)
-        e.printStackTrace(System.out)
-    } finally loc.Close()
-  }
+    val rec = loc.IPQuery(ip)
+    if ("OK" == rec.getStatus) System.out.println(rec)
+    else if ("EMPTY_IP_ADDRESS" == rec.getStatus) System.out.println("IP address cannot be blank.")
+    else if ("INVALID_IP_ADDRESS" == rec.getStatus) System.out.println("Invalid IP address.")
+    else if ("MISSING_FILE" == rec.getStatus) System.out.println("Invalid database path.")
+    else if ("IPV6_NOT_SUPPORTED" == rec.getStatus) System.out.println("This BIN does not contain IPv6 data.")
+    else System.out.println("Unknown error." + rec.getStatus)
+  } catch {
+    case e: Exception =>
+      System.out.println(e)
+      e.printStackTrace(System.out)
+  } finally loc.Close()
 }
 ```
